@@ -1,26 +1,27 @@
-const { Pool } = require('pg');
+import { Pool } from 'pg';
+import dotenv from 'dotenv';
+import { Request, Response } from 'express';
 
-require('dotenv').config();
+dotenv.config();
 
-const { USER, HOST, PASSWORD, DATABASE, } = process.env;
-const DATABASE_URL = 'postgresql://' + USER + ':' + PASSWORD + '@' + HOST + '/' + DATABASE + '?sslmode=require';
+const { USER, HOST, PASSWORD, DATABASE } = process.env;
+const DATABASE_URL = `postgresql://${USER}:${PASSWORD}@${HOST}/${DATABASE}?sslmode=require`;
 
 const pool = new Pool({
   connectionString: DATABASE_URL,
-  //временное решение до подключения ssl сертификата
   ssl: {
-    rejectUnauthorized: false,
+    rejectUnauthorized: false, // временное решение до подключения ssl сертификата
   },
 });
 
 // Обработка ошибок подключения к базе данных
-pool.on('error', (err) => {
+pool.on('error', (err: Error) => {
   console.error('Unexpected error on idle client', err);
   process.exit(-1); // Завершение процесса в случае непредвиденной ошибки
 });
 
 // Функция для получения истории изменения всех пользователей
-const getHistory = (_, response) => {
+export const getHistory = (_: Request, response: Response) => {
   pool.query('SELECT * FROM user_changes ORDER BY action_id ASC', (error, results) => {
     if (error) {
       console.error('Database query error', error);
@@ -31,7 +32,8 @@ const getHistory = (_, response) => {
   });
 };
 
-const getUserHistory = (request, response) => {
+// Функция для получения истории изменений конкретного пользователя
+export const getUserHistory = (request: Request, response: Response) => {
   const id = request.query.id;
 
   if (!id) {
@@ -53,6 +55,3 @@ const getUserHistory = (request, response) => {
     response.status(200).json(results.rows);
   });
 };
-module.exports = { getHistory, getUserHistory };
-
-

@@ -1,8 +1,12 @@
-const express = require('express');
+import express, { Request, Response } from 'express';
+import rateLimit from 'express-rate-limit';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { requestLogger, errorLogger } from './middlewares/logger';
+import * as db from './queries';
 
-const rateLimit = require('express-rate-limit');
-
-const bodyParser = require('body-parser');
+dotenv.config();
 
 const app = express();
 
@@ -11,15 +15,7 @@ const limiter = rateLimit({
   max: 100, // максимум 100 обращений
 });
 
-const db = require('./queries');
-
-require('dotenv').config();
-
 const { PORT } = process.env;
-
-const cors = require('cors');
-
-const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 app.use(cors({
   origin: [
@@ -40,7 +36,7 @@ app.use(limiter);
 
 app.get('/', db.getHistory);
 app.get('/user', db.getUserHistory);
-app.get('*', (_, res) => {
+app.get('*', (_: Request, res: Response) => {
   return res.status(404).send('Invalid Page');
 });
 
