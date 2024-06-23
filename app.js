@@ -39,6 +39,7 @@ app.use(requestLogger); // логгер запросов
 app.use(limiter);
 
 app.get('/', db.getHistory);
+app.get('/user', db.getUserHistory);
 app.get('*', (_, res) => {
   return res.status(404).send('Invalid Page');
 });
