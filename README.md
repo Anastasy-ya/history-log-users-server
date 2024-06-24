@@ -4,13 +4,16 @@ TypeScript - Express.js - cors - node-postgres - express-rate-limit
 
 _Изучение облачной базы данных и синтаксиса postgresql_
 
-# Сервис работает с табоицей user_changes и возвращает историю изменения user таблицы users
+## Сервис работает с табоицей user_changes и возвращает историю изменения user таблицы users
 
 ## Ссылки
 
 https://github.com/Anastasy-ya/postgresqlProject
+<br>
 https://github.com/Anastasy-ya/history-log-users-server
+<br>
 https://github.com/Anastasy-ya/BigDB
+<br>
 
 ## Используется облачная база данных postgresql neon.tech
 
