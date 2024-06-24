@@ -1,8 +1,16 @@
 # history-log-users-server
 
+TypeScript - Express.js - cors - node-postgres - express-rate-limit
+
 _Изучение облачной базы данных и синтаксиса postgresql_
 
-_Является частью проекта postgresqlProject_
+# Сервис работает с табоицей user_changes и возвращает историю изменения user таблицы users
+
+## Ссылки
+
+https://github.com/Anastasy-ya/postgresqlProject
+https://github.com/Anastasy-ya/history-log-users-server
+https://github.com/Anastasy-ya/BigDB
 
 ## Используется облачная база данных postgresql neon.tech
 
@@ -37,17 +45,15 @@ postgres://alex:AbC123dEf@ep-cool-darkness-123456.us-east-2.aws.neon.tech/dbname
 ### Скрипт для создания SQL-таблицы и заполнения ее рандомными значениями: 
 
 ```
--- Создание таблицы users
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    first_name CHAR(3) NOT NULL,
-    last_name CHAR(3) NOT NULL,
+    first_name VARCHAR(3) NOT NULL,
+    last_name VARCHAR(3) NOT NULL,
     age INT CHECK (age BETWEEN 18 AND 100),
     gender CHAR(1) CHECK (gender IN ('m', 'f')),
     problems BOOLEAN
 );
 
--- Функция для генерации случайной строки заданной длины
 CREATE OR REPLACE FUNCTION random_string(length INT) RETURNS TEXT AS $$
 DECLARE
     result TEXT := '';
@@ -60,28 +66,24 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Функция для генерации случайного возраста
 CREATE OR REPLACE FUNCTION random_age() RETURNS INT AS $$
 BEGIN
     RETURN FLOOR(RANDOM() * 83) + 18;
 END;
 $$ LANGUAGE plpgsql;
 
--- Функция для генерации случайного пола
 CREATE OR REPLACE FUNCTION random_gender() RETURNS CHAR(1) AS $$
 BEGIN
     RETURN CASE WHEN RANDOM() < 0.5 THEN 'm' ELSE 'f' END;
 END;
 $$ LANGUAGE plpgsql;
 
--- Функция для генерации случайного значения для проблемы
 CREATE OR REPLACE FUNCTION random_problems() RETURNS BOOLEAN AS $$
 BEGIN
     RETURN RANDOM() < 0.5;
 END;
 $$ LANGUAGE plpgsql;
 
--- Функция для вставки случайного пользователя
 CREATE OR REPLACE FUNCTION insert_random_person(num_users INT) RETURNS VOID AS $$
 DECLARE
     i INT;
@@ -93,8 +95,22 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Вставка пользователей
-SELECT insert_random_person(1000);
+DO $$
+DECLARE
+    batch_size INT := 10000;
+    total_users INT := 1000000;
+    batches INT := total_users / batch_size;
+    i INT;
+BEGIN
+    FOR i IN 1..batches LOOP
+        PERFORM insert_random_person(batch_size);
+        COMMIT;
+        RAISE NOTICE 'Inserted % batches of % records', i, batch_size;
+    END LOOP;
+END $$;
+
+CREATE INDEX idx_users_id ON users(id);
+CREATE INDEX idx_users_problems ON users(problems);
 ```
 
 ### Cкрипт для создания связанной таблицы с историей изменения первой таблицы
@@ -118,6 +134,7 @@ cd postgresqlProject
 <br>
 npm install
 <br>
+npm run build
 npm start
 
 ## Проверка
@@ -126,7 +143,13 @@ npm start
 
 GET http://localhost:5432
 
+### get one user:
+
+GET http://localhost:5432/user?id=200
+
 ### 404:
 
 GET http://localhost:5432/sdfg
+
+/user
 
