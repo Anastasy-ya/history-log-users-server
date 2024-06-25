@@ -22,7 +22,7 @@ pool.on('error', (err: Error) => {
 
 // Функция для получения истории изменения всех пользователей
 export const getHistory = (_: Request, response: Response) => {
-  pool.query('SELECT * FROM user_changes ORDER BY action_id ASC', (error, results) => {
+  pool.query('SELECT * FROM person_changes ORDER BY action_id ASC', (error, results) => {
     if (error) {
       console.error('Database query error', error);
       // Установить статус 500 в случае ошибки базы данных и отправить сообщение об ошибке
@@ -40,7 +40,7 @@ export const getUserHistory = (request: Request, response: Response) => {
     return response.status(400).send('User ID is required');
   }
 
-  pool.query('SELECT * FROM user_changes WHERE user_id = $1 ORDER BY action_id ASC', [id], (error, results) => {
+  pool.query('SELECT * FROM person_changes WHERE user_id = $1 ORDER BY action_id ASC', [id], (error, results) => {
     if (error) {
       console.error('Database query error', error);
       // Установить статус 500 в случае ошибки базы данных и отправить сообщение об ошибке
