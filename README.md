@@ -180,9 +180,9 @@ CREATE TABLE person_changes (
 ```
 
 ## Запуск
-git clone git@github.com:Anastasy-ya/postgresqlProject.git
+git clone git@github.com:Anastasy-ya/history-log-users-server.git
 <br>
-cd postgresqlProject
+cd history-log-users-server
 <br>
 npm install
 <br>
